@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🐼 中文默書樂園 · P3 Chinese Dictation</title>
+<style>
+  :root{
+    --pink:#ffd7e6;      --pink-deep:#ff9dc0;
+    --mint:#d5f6e6;      --mint-deep:#7fd8b4;
+    --lilac:#e4dcff;     --lilac-deep:#a892ff;
+    --sun:#ffe9b0;       --sun-deep:#ffcd6b;
+    --cream:#fffaf3;
+    --ink:#5c4a5c;       --ink-soft:#9b8a9b;
+    --red:#ff5d73;       --green:#2fb683;      --blue:#5bb8e8;
+    --shadow:0 18px 38px rgba(255,157,192,.22);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    margin:0; padding:14px 12px 40px;
+    font-family:"Comic Sans MS","Chalkboard SE","Comic Neue",-apple-system,
+                "Segoe UI Rounded","Segoe UI Variable","Segoe UI",
+                "PingFang HK","PingFang SC","Microsoft JhengHei","Microsoft YaHei",
+                Nunito,system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1100px 640px at 8% -8%,  #ffe6f1 0%, rgba(255,230,241,0) 62%),
+      radial-gradient(1000px 620px at 98% 4%,  #ddf8ea 0%, rgba(221,248,234,0) 60%),
+      radial-gradient(900px 700px at 50% 118%, #fff4d8 0%, rgba(255,244,216,0) 62%),
+      linear-gradient(160deg,#ffeef6 0%,#f3fbf7 48%,#eaf7ff 100%);
+    background-attachment:fixed;
+    min-height:100%; -webkit-text-size-adjust:100%;
+  }
+  .bubbles{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .bubbles b{ position:absolute; border-radius:50%; opacity:.5; animation:float 11s ease-in-out infinite; }
+  .bubbles b:nth-child(1){ width:112px;height:112px; left:3%;  top:70%; background:var(--pink);  animation-delay:0s; }
+  .bubbles b:nth-child(2){ width:76px; height:76px;  left:89%; top:14%; background:var(--mint);  animation-delay:1.4s; }
+  .bubbles b:nth-child(3){ width:52px; height:52px;  left:13%; top:9%;  background:var(--lilac); animation-delay:2.6s; }
+  .bubbles b:nth-child(4){ width:42px; height:42px;  left:76%; top:79%; background:var(--sun);   animation-delay:3.5s; }
+  .bubbles b:nth-child(5){ width:66px; height:66px;  left:44%; top:92%; background:#cdefff;      animation-delay:4.6s; }
+  @keyframes float{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-26px) } }
+
+  #confetti{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:70; }
+
+  .app{ position:relative; z-index:1; width:100%; max-width:680px; margin:0 auto; }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex; gap:8px; align-items:center; justify-content:space-between;
+    background:rgba(255,255,255,.8); border:3px solid #fff; border-radius:26px;
+    padding:9px 12px; box-shadow:var(--shadow); backdrop-filter:blur(6px);
+  }
+  .brand{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .brand .logo{ font-size:26px; }
+  .brand .txt{ min-width:0; }
+  .brand b{ display:block; font-size:16px; letter-spacing:.3px; white-space:nowrap; }
+  .brand span{ font-size:11px; color:var(--ink-soft); }
+  .stats{ display:flex; gap:6px; flex-shrink:0; }
+  .stat{
+    min-width:56px; text-align:center; background:linear-gradient(180deg,#fff,#fff7fb);
+    border:2.5px dashed var(--pink-deep); border-radius:15px; padding:4px 7px 5px;
+  }
+  .stat.mint{ border-color:var(--mint-deep); background:linear-gradient(180deg,#fff,#f4fffa); }
+  .stat.lilac{ border-color:var(--lilac-deep); background:linear-gradient(180deg,#fff,#f8f6ff); }
+  .stat em{ display:block; font-style:normal; font-size:9.5px; color:var(--ink-soft); letter-spacing:.4px; }
+  .stat b{ font-size:18px; }
+  .pop{ animation:pop .45s ease; }
+  @keyframes pop{ 0%{transform:scale(1)} 38%{transform:scale(1.42)} 100%{transform:scale(1)} }
+
+  /* ---------- shared panels ---------- */
+  .card{
+    margin-top:14px; background:rgba(255,255,255,.87); border:3px solid #fff;
+    border-radius:30px; padding:18px; box-shadow:0 20px 44px rgba(127,216,180,.2);
+    backdrop-filter:blur(6px);
+  }
+  h2.sec{ margin:0 0 12px; font-size:19px; display:flex; align-items:center; gap:8px; }
+  h2.sec small{ font-weight:400; font-size:12px; color:var(--ink-soft); }
+
+  button{ font-family:inherit; cursor:pointer; border:none; color:#fff; font-weight:700;
+          transition:transform .1s ease, filter .18s ease, box-shadow .18s ease; touch-action:manipulation; }
+  button:active{ transform:translateY(3px) scale(.99); }
+  button:disabled{ filter:grayscale(.6) opacity(.5); cursor:default; transform:none !important; }
+
+  .panda{ font-size:56px; line-height:1; animation:bob 2.6s ease-in-out infinite;
+          filter:drop-shadow(0 8px 10px rgba(255,157,192,.35)); }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-2deg) } 50%{ transform:translateY(-8px) rotate(2deg) } }
+  .panda.happy{ animation:cheer .6s ease 2; }
+  .panda.sad  { animation:shake .5s ease 1; }
+  @keyframes cheer{ 0%{transform:scale(1)} 45%{transform:scale(1.22) rotate(-7deg)} 100%{transform:scale(1)} }
+  @keyframes shake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px) rotate(-5deg)} 75%{transform:translateX(9px) rotate(5deg)} }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+
+  /* ---------- home ---------- */
+  .hero{ display:flex; align-items:flex-end; gap:12px; }
+  .speech{
+    position:relative; flex:1; background:#fff8fc; border:3px solid var(--pink);
+    border-radius:20px 20px 20px 6px; padding:9px 13px; font-size:14.5px; min-height:44px;
+    display:flex; align-items:center;
+  }
+  .ttsnote{ margin-top:10px; font-size:11.5px; color:var(--ink-soft); display:flex;
+            align-items:center; gap:6px; background:#fbf7ff; border:2px dashed var(--lilac-deep);
+            border-radius:14px; padding:6px 10px; }
+
+  .modes{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+  .mode{
+    position:relative; text-align:left; border-radius:26px; padding:15px 15px 14px;
+    color:var(--ink); background:linear-gradient(180deg,#fff,#fff6fb);
+    border:3px solid var(--pink); box-shadow:0 8px 0 rgba(255,157,192,.4), 0 14px 26px rgba(255,157,192,.24);
+  }
+  .mode:nth-child(2){ border-color:var(--mint-deep); background:linear-gradient(180deg,#fff,#f3fffa);
+                      box-shadow:0 8px 0 rgba(127,216,180,.45), 0 14px 26px rgba(127,216,180,.24); }
+  .mode:nth-child(3){ border-color:var(--lilac-deep); background:linear-gradient(180deg,#fff,#f8f6ff);
+                      box-shadow:0 8px 0 rgba(168,146,255,.4), 0 14px 26px rgba(168,146,255,.22); }
+  .mode:nth-child(4){ border-color:var(--sun-deep); background:linear-gradient(180deg,#fff,#fffdf3);
+                      box-shadow:0 8px 0 rgba(255,205,107,.5), 0 14px 26px rgba(255,205,107,.24); }
+  .mode .emoji{ font-size:30px; }
+  .mode .name{ font-size:19px; margin-top:2px; }
+  .mode .sub{ font-size:11.5px; color:var(--ink-soft); font-weight:400; margin-top:2px; line-height:1.35; }
+
+  .rows{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:#fff; border:3px solid var(--mint); border-radius:22px; padding:12px 14px;
+  }
+  .row .lbl{ font-size:14.5px; font-weight:700; }
+  .row .lbl small{ display:block; font-weight:400; font-size:11.5px; color:var(--ink-soft); }
+  .switch{ position:relative; width:64px; height:34px; border-radius:99px; background:#e8dfea;
+           border:3px solid #fff; box-shadow:inset 0 2px 6px rgba(0,0,0,.08); flex-shrink:0;
+           cursor:pointer; transition:background .2s ease; }
+  .switch::after{ content:""; position:absolute; top:2px; left:2px; width:24px; height:24px;
+                  border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.18);
+                  transition:transform .2s ease; }
+  .switch.on{ background:var(--mint-deep); }
+  .switch.on::after{ transform:translateX(28px); }
+
+  .btn{ border-radius:20px; padding:13px 17px; font-size:16px; }
+  .btn-sm{ border-radius:16px; padding:9px 13px; font-size:13.5px; }
+  .b-pink { background:linear-gradient(180deg,#ffc2d8,#ff9dc0); box-shadow:0 6px 0 #e5799f; }
+  .b-mint { background:linear-gradient(180deg,#8fe3c1,#4ec79a); box-shadow:0 6px 0 #35a97f; }
+  .b-lilac{ background:linear-gradient(180deg,#c9bbff,#a892ff); box-shadow:0 6px 0 #8069d6; }
+  .b-sun  { background:linear-gradient(180deg,#ffe3a8,#ffcd6b); color:#7a5a12; box-shadow:0 6px 0 #e0ac3c; }
+  .b-plain{ background:linear-gradient(180deg,#fff,#f6f1f7); color:var(--ink);
+            box-shadow:0 6px 0 #ded3e0; border:2px solid #fff; }
+  .b-danger{ background:linear-gradient(180deg,#ffb3c0,#ff8098); box-shadow:0 6px 0 #d8637b; }
+  .b-pink:active,.b-mint:active,.b-lilac:active,.b-sun:active,.b-plain:active,.b-danger:active{ box-shadow:0 3px 0 rgba(0,0,0,.25); }
+
+  .btnbar{ display:flex; gap:9px; flex-wrap:wrap; margin-top:12px; }
+  .btnbar .btn{ flex:1 1 auto; }
+
+  /* ---------- games ---------- */
+  .gamehead{ display:flex; align-items:center; gap:10px; }
+  .back{ flex-shrink:0; width:44px; height:44px; border-radius:16px; font-size:20px;
+         background:linear-gradient(180deg,#fff,#f4eef6); color:var(--ink); box-shadow:0 5px 0 #ded3e0; }
+  .gtitle{ flex:1; min-width:0; }
+  .gtitle b{ display:block; font-size:17px; }
+  .gtitle span{ font-size:11.5px; color:var(--ink-soft); }
+  .qcount{ font-size:11.5px; color:var(--ink-soft); background:#fff; border:2px dashed var(--pink);
+           border-radius:12px; padding:4px 9px; white-space:nowrap; }
+  .progress{ margin-top:12px; height:11px; border-radius:99px; background:#f0e8f2; overflow:hidden; border:2px solid #fff; }
+  .progress > i{ display:block; height:100%; width:0%; border-radius:99px;
+                 background:linear-gradient(90deg,var(--pink-deep),var(--mint-deep)); transition:width .35s ease; }
+
+  .tagline{ display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+  .tag{ font-size:11.5px; background:#fff; border:2px solid var(--mint-deep); color:#3e7d66;
+        border-radius:99px; padding:3px 10px; }
+  .prompt-label{ margin:14px 0 4px; text-align:center; font-size:11.5px;
+                 letter-spacing:2.2px; text-transform:uppercase; color:var(--ink-soft); }
+  .prompt{ text-align:center; font-size:clamp(34px,10vw,52px); font-weight:700; letter-spacing:1px;
+           color:#4a3b52; text-shadow:0 3px 0 #fff, 0 6px 12px rgba(255,157,192,.3); word-break:break-word; }
+  .prompt.jyut{ font-size:clamp(26px,7.5vw,38px); color:#5b4a86; letter-spacing:0; }
+  .prompt small{ display:block; font-size:12px; font-weight:400; letter-spacing:0; color:var(--ink-soft); margin-top:6px; }
+
+  .speakbtn{
+    display:flex; align-items:center; justify-content:center; gap:9px; margin:14px auto 0;
+    width:100%; max-width:330px; border-radius:22px; padding:14px 18px; font-size:17px;
+    background:linear-gradient(180deg,#9fe6ff,#5bb8e8); box-shadow:0 6px 0 #3d92bd;
+  }
+  .speakbtn:active{ box-shadow:0 3px 0 #3d92bd; }
+
+  input[type=text]{
+    width:100%; font-family:inherit; font-size:clamp(28px,8.5vw,40px); text-align:center; letter-spacing:6px;
+    padding:13px 15px; color:#3f3446; background:#fffdf9; border:4px solid var(--mint-deep);
+    border-radius:24px; outline:none; box-shadow:0 10px 22px rgba(127,216,180,.22);
+    transition:border-color .18s ease, box-shadow .18s ease, transform .12s ease;
+  }
+  input[type=text]::placeholder{ color:#cbbfd0; letter-spacing:2px; font-size:.6em; }
+  input[type=text]:focus{ border-color:var(--pink-deep); box-shadow:0 12px 26px rgba(255,157,192,.3); transform:translateY(-1px); }
+  input.shake{ animation:shake .45s ease 1; border-color:var(--red); }
+  input.win{ border-color:var(--green); background:#f4fffb; }
+  .answer-wrap{ margin-top:16px; }
+
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-top:16px; }
+  .choice{
+    border-radius:24px; padding:18px 10px; font-size:clamp(28px,8vw,40px); font-weight:700; letter-spacing:4px;
+    color:#4a3b52; background:linear-gradient(180deg,#fff,#fdf7ff);
+    border:3px solid var(--lilac-deep); box-shadow:0 7px 0 rgba(168,146,255,.35);
+  }
+  .choice small{ display:block; font-size:11px; font-weight:400; letter-spacing:0;
+                 color:var(--ink-soft); margin-top:5px; }
+  .choice.jyut{ font-size:clamp(19px,5.4vw,26px); letter-spacing:0; }
+  .choice.right{ background:linear-gradient(180deg,#d9fbee,#a9ecd0); border-color:var(--green);
+                 box-shadow:0 7px 0 #4fae86; }
+  .choice.wrong{ background:linear-gradient(180deg,#ffe3e8,#ffc4cd); border-color:var(--red);
+                 box-shadow:0 7px 0 #d8637b; }
+  .choice:disabled{ opacity:1; }
+
+  /* canvas game */
+  .canvas-wrap{ position:relative; margin-top:14px; border-radius:26px; overflow:hidden;
+                border:4px solid var(--sun-deep); background:#fff; box-shadow:0 10px 24px rgba(255,205,107,.3); }
+  canvas#paper{ display:block; width:100%; height:300px; touch-action:none; cursor:crosshair; }
+  .canvas-hint{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:9px; }
+
+  .feedback{ margin-top:14px; border-radius:22px; display:none; align-items:center; gap:13px;
+             padding:11px 15px; border:3px solid transparent; animation:fadeUp .28s ease; }
+  .feedback.show{ display:flex; }
+  .feedback.ok { background:#e9fdf4; border-color:#a9ecd0; }
+  .feedback.bad{ background:#ffeef1; border-color:#ffc4cd; }
+  .feedback .mark{ font-size:34px; line-height:1; }
+  .feedback .msg{ font-size:15.5px; font-weight:700; }
+  .feedback .sub{ font-size:12.5px; color:var(--ink-soft); font-weight:400; margin-top:2px; }
+  .answer-chars{ font-size:34px; letter-spacing:6px; color:var(--red); font-weight:700; text-shadow:0 2px 0 #fff; }
+
+  /* ---------- word manager ---------- */
+  .tabs{ display:flex; gap:8px; margin-bottom:12px; background:#f6eef7; padding:5px; border-radius:20px; }
+  .tab{ flex:1; border-radius:16px; padding:10px; font-size:14px; color:var(--ink);
+        background:transparent; box-shadow:none; }
+  .tab.active{ background:#fff; box-shadow:0 4px 0 rgba(255,157,192,.35); }
+  .tab .n{ font-size:11.5px; color:var(--ink-soft); }
+
+  .form{ background:#fdf8ff; border:3px dashed var(--lilac-deep); border-radius:22px; padding:13px; }
+  .form .fields{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .field{ display:flex; flex-direction:column; gap:3px; }
+  .field.full{ grid-column:1 / -1; }
+  .field label{ font-size:11px; color:var(--ink-soft); letter-spacing:.4px; }
+  .field input, .field select{
+    font-family:inherit; font-size:15px; padding:9px 11px; border-radius:14px;
+    border:2.5px solid var(--pink); background:#fff; color:var(--ink); outline:none; width:100%;
+  }
+  .field input:focus, .field select:focus{ border-color:var(--lilac-deep); }
+  .field input.chars{ font-size:22px; letter-spacing:3px; text-align:center; }
+
+  .wordlist{ margin-top:12px; max-height:340px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
+  .wrow{
+    display:flex; align-items:center; gap:10px; background:#fff; border:2.5px solid var(--mint);
+    border-radius:18px; padding:9px 11px;
+  }
+  .wrow .w-cn{ font-size:23px; letter-spacing:2px; font-weight:700; flex-shrink:0; }
+  .wrow .w-mid{ flex:1; min-width:0; }
+  .wrow .w-jy{ font-size:12.5px; color:#6b5a8a; }
+  .wrow .w-en{ font-size:12.5px; color:var(--ink-soft); }
+  .wrow .w-tag{ font-size:10.5px; background:#f2fbf7; border:2px solid var(--mint); color:#3e7d66;
+                border-radius:99px; padding:2px 8px; display:inline-block; margin-top:3px; }
+  .wrow .acts{ display:flex; gap:5px; flex-shrink:0; }
+  .icon-btn{ width:36px; height:36px; border-radius:12px; font-size:15px;
+             background:linear-gradient(180deg,#fff,#f4eef6); color:var(--ink); box-shadow:0 4px 0 #ded3e0; }
+  .empty{ text-align:center; color:var(--ink-soft); font-size:13.5px; padding:18px 8px; }
+  .catlist{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .catlist .cat{ font-size:11px; background:#fff; border:2px solid var(--pink); border-radius:99px;
+                 padding:3px 9px; cursor:pointer; }
+  .catlist .cat:hover{ background:#fff4f9; }
+
+  /* ---------- overlay / summary ---------- */
+  .overlay{ position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center;
+            padding:18px; background:rgba(90,70,95,.36); backdrop-filter:blur(4px); }
+  .overlay.show{ display:flex; }
+  .sheet{ width:100%; max-width:440px; text-align:center; background:var(--cream); border:4px solid #fff;
+          border-radius:32px; padding:24px 20px 22px; box-shadow:0 26px 60px rgba(90,70,95,.32);
+          animation:fadeUp .3s ease; max-height:92vh; overflow:auto; }
+  .sheet .big{ font-size:58px; line-height:1.1; }
+  .sheet h2{ margin:6px 0 4px; font-size:24px; }
+  .sheet p{ margin:0 0 14px; color:var(--ink-soft); font-size:14px; }
+  .scoreline{ font-size:18px; font-weight:700; margin-bottom:14px; }
+  .minigrid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
+  .minigrid div{ background:#fff; border:2.5px dashed var(--pink); border-radius:16px; padding:8px 4px; }
+  .minigrid em{ display:block; font-style:normal; font-size:10px; color:var(--ink-soft); }
+  .minigrid b{ font-size:18px; }
+  .review{ text-align:left; max-height:180px; overflow:auto; background:#fff; border:2.5px dashed var(--pink);
+           border-radius:18px; padding:9px 11px; margin-bottom:14px; font-size:14px; }
+  .review div{ padding:4px 2px; border-bottom:1px dashed #f2e7ee; display:flex; justify-content:space-between; gap:10px; }
+  .review div:last-child{ border-bottom:none; }
+  .review .chars{ letter-spacing:3px; font-weight:700; }
+  .review .no{ color:var(--ink-soft); font-size:12px; }
+
+  #toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px);
+          z-index:90; background:#fff; border:3px solid var(--mint-deep); color:var(--ink);
+          border-radius:18px; padding:10px 16px; font-size:13.5px; box-shadow:0 12px 28px rgba(90,70,95,.22);
+          opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; max-width:90vw; text-align:center; }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .hide{ display:none !important; }
+
+  @media (max-width:420px){
+    .brand b{ font-size:14px; }
+    .stat{ min-width:48px; padding:3px 5px; }
+    .stat b{ font-size:16px; }
+    .modes{ grid-template-columns:1fr; }
+    .form .fields{ grid-template-columns:1fr; }
+    .choices{ gap:9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bubbles" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></div>
+<canvas id="confetti"></canvas>
+
+<div class="app">
+
+  <!-- ================= TOP BAR ================= -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="logo">🐼</span>
+      <span class="txt">
+        <b>中文默書樂園</b>
+        <span>P3 Cantonese Dictation</span>
+      </span>
+    </div>
+    <div class="stats">
+      <div class="stat mint"><em>LEARNED</em><b id="hLearned">0</b></div>
+      <div class="stat"><em>STREAK 🔥</em><b id="hStreak">0</b></div>
+      <div class="stat lilac"><em>ACCURACY</em><b id="hAcc">–</b></div>
+    </div>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section id="screen-home">
+    <div class="card">
+      <div class="hero">
+        <div class="panda" id="homePanda">🐼</div>
+        <div class="speech" id="homeSpeech">你好！揀一個遊戲開始啦 — pick a game to start!</div>
+      </div>
+      <div class="ttsnote" id="ttsNote">🔈 Checking Cantonese voice…</div>
+
+      <div class="modes">
+        <button class="mode" data-game="listen">
+          <div class="emoji">🎧</div>
+          <div class="name">聽寫</div>
+          <div class="sub">Listen &amp; Type<br>Hear the word, type it</div>
+        </button>
+        <button class="mode" data-game="pick">
+          <div class="emoji">👀</div>
+          <div class="name">看圖選字</div>
+          <div class="sub">Pick the Right Word<br>4 choices</div>
+        </button>
+        <button class="mode" data-game="jyut">
+          <div class="emoji">🔤</div>
+          <div class="name">拼音配對</div>
+          <div class="sub">Jyutping Match<br>Match the romanization</div>
+        </button>
+        <button class="mode" data-game="stroke">
+          <div class="emoji">✏️</div>
+          <div class="name">筆順挑戰</div>
+          <div class="sub">Stroke Order<br>Trace the character</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">⚙️ 設定 <small>settings</small></h2>
+      <div class="rows">
+        <div class="row">
+          <span class="lbl">📚 Revision First
+            <small>Use Revision words first, then mix in New Words</small></span>
+          <div class="switch on" id="swRevisionFirst" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+        <div class="row">
+          <span class="lbl">🔊 Sound effects
+            <small>Beeps for correct / wrong</small></span>
+          <div class="switch on" id="swSound" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+        <div class="row">
+          <span class="lbl">🗣️ Cantonese speech
+            <small>Read words aloud with zh-HK voice</small></span>
+          <div class="switch on" id="swSpeak" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+      </div>
+      <div class="btnbar">
+        <button class="btn b-lilac" id="goManage">📝 Manage Words</button>
+        <button class="btn b-plain" id="goExport">⬇️ Download for GitHub</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORD MANAGER ================= -->
+  <section id="screen-manage" class="hide">
+    <div class="card">
+      <div class="gamehead">
+        <button class="back" data-home="1" title="Back home">🏠</button>
+        <div class="gtitle"><b>📝 Manage Words 詞語管理</b><span>Your lists are saved in this browser</span></div>
+      </div>
+
+      <div class="tabs" style="margin-top:14px">
+        <button class="tab active" data-tab="rev">Revision 已學 <span class="n" id="tabRevN">(0)</span></button>
+        <button class="tab" data-tab="new">New Words 新詞 <span class="n" id="tabNewN">(0)</span></button>
+      </div>
+
+      <div class="form">
+        <div class="fields">
+          <div class="field full">
+            <label>CHINESE 中文字 <span style="color:#c66">*</span></label>
+            <input type="text" class="chars" id="fChars" placeholder="蘋果" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label>JYUTPING 粵拼</label>
+            <input type="text" id="fJyut" placeholder="ping4 gwo2" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label>ENGLISH 英文</label>
+            <input type="text" id="fEn" placeholder="apple" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field full">
+            <label>CATEGORY 分類</label>
+            <input type="text" id="fCat" placeholder="課本 Unit 1" list="catOptions" autocomplete="off">
+            <datalist id="catOptions"></datalist>
+          </div>
+        </div>
+        <div class="btnbar">
+          <button class="btn b-mint" id="saveWord">➕ Add to list</button>
+          <button class="btn b-plain hide" id="cancelEdit">Cancel</button>
+        </div>
+        <div class="catlist" id="catChips"></div>
+      </div>
+
+      <div class="wordlist" id="wordList"></div>
+
+      <div class="btnbar">
+        <button class="btn b-plain btn-sm" id="exportJson">💾 Export JSON</button>
+        <button class="btn b-plain btn-sm" id="importJson">📂 Import JSON</button>
+        <button class="btn b-danger btn-sm" id="resetWords">♻️ Reset to defaults</button>
+      </div>
+      <input type="file" id="fileInput" accept=".json,application/json" class="hide">
+    </div>
+  </section>
+
+  <!-- ================= GAME ================= -->
+  <section id="screen-game" class="hide">
+    <div class="card">
+      <div class="gamehead">
+        <button class="back" id="gameBack" title="Back home">🏠</button>
+        <div class="gtitle"><b id="gTitle">Game</b><span id="gSub">—</span></div>
+        <span class="qcount" id="gCount">1 / 8</span>
+      </div>
+      <div class="progress"><i id="gBar"></i></div>
+
+      <div class="hero" style="margin-top:14px">
+        <div class="panda" id="gamePanda">🐼</div>
+        <div class="speech" id="gameSpeech">準備好未？</div>
+      </div>
+
+      <div class="tagline" id="gTags"></div>
+
+      <!-- Game A: listen & type -->
+      <div id="area-listen" class="hide">
+        <div class="prompt-label">listen, then write the characters</div>
+        <button class="speakbtn" id="playWord">🔊 Play the word again</button>
+        <div class="answer-wrap">
+          <input type="text" id="answerInput" placeholder="喺呢度打中文字…"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="btnbar">
+          <button class="btn b-mint" id="checkBtn">✅ Check 檢查</button>
+          <button class="btn b-sun" id="hintBtn">💡 Hint</button>
+          <button class="btn b-plain" id="skipBtn">⏭️ Skip</button>
+        </div>
+      </div>
+
+      <!-- Game B / C: multiple choice -->
+      <div id="area-choice" class="hide">
+        <div class="prompt-label" id="choiceLabel">pick the right word</div>
+        <div class="prompt" id="choicePrompt">apple</div>
+        <button class="speakbtn hide" id="playChoice">🔊 Hear it in Cantonese</button>
+        <div class="choices" id="choiceGrid"></div>
+      </div>
+
+      <!-- Game D: tracing -->
+      <div id="area-stroke" class="hide">
+        <div class="prompt-label">trace the faint character with your finger</div>
+        <div class="prompt" id="strokePrompt">蘋</div>
+        <div class="canvas-wrap"><canvas id="paper"></canvas></div>
+        <div class="canvas-hint">Trace over the grey character. Cover <b>about a third</b> of it and keep inside the lines.</div>
+        <div class="btnbar">
+          <button class="btn b-mint" id="checkTrace">✅ Check my tracing</button>
+          <button class="btn b-plain" id="clearTrace">🧽 Clear</button>
+          <button class="btn b-sun" id="revealTrace">👀 Show me</button>
+          <button class="btn b-plain" id="skipTrace">⏭️ Skip</button>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback">
+        <div class="mark" id="fbMark">✅</div>
+        <div>
+          <div class="msg" id="fbMsg"></div>
+          <div class="sub" id="fbSub"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= SUMMARY ================= -->
+<div class="overlay" id="summary">
+  <div class="sheet">
+    <div class="big" id="sumEmoji">🎉</div>
+    <h2 id="sumTitle">做得好！</h2>
+    <p id="sumSub">Round finished.</p>
+    <div class="minigrid">
+      <div><em>CORRECT</em><b id="sumCorrect">0</b></div>
+      <div><em>ACCURACY</em><b id="sumAcc">0%</b></div>
+      <div><em>BEST STREAK</em><b id="sumStreak">0</b></div>
+    </div>
+    <div class="review" id="sumReview"></div>
+    <div class="btnbar" style="margin-top:0">
+      <button class="btn b-mint" id="playAgain">🔁 Play again</button>
+      <button class="btn b-plain" id="sumHome">🏠 Home</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     1. CONSTANTS & DEFAULT DATA
+     ============================================================ */
+  var KEY_WORDS = "hkP3dict.words.v2";
+  var KEY_STATS = "hkP3dict.stats.v2";
+  var KEY_PREF  = "hkP3dict.prefs.v2";
+  var KEY_MASTERY = "hkP3dict.mastery.v2";
+
+  var DEFAULT_WORDS = [
+    { chars:"蘋果",     jyut:"ping4 gwo2",   en:"apple",    cat:"課本 Unit 1", list:"rev" },
+    { chars:"香蕉",     jyut:"hoeng1 ziu1",  en:"banana",   cat:"課本 Unit 1", list:"rev" },
+    { chars:"學校",     jyut:"hok6 haau6",   en:"school",   cat:"課本 Unit 1", list:"rev" },
+    { chars:"老師",     jyut:"lou5 si1",     en:"teacher",  cat:"默書範圍",    list:"rev" },
+    { chars:"朋友",     jyut:"pang4 jau5",   en:"friend",   cat:"默書範圍",    list:"rev" },
+    { chars:"書",       jyut:"syu1",         en:"book",     cat:"課本 Unit 2", list:"rev" },
+    { chars:"水",       jyut:"seoi2",        en:"water",    cat:"課本 Unit 2", list:"rev" },
+    { chars:"開心",     jyut:"hoi1 sam1",    en:"happy",    cat:"默書範圍",    list:"rev" },
+    { chars:"跑步",     jyut:"paau2 bou6",   en:"run",      cat:"課本 Unit 2", list:"rev" },
+    { chars:"紅色",     jyut:"hung4 sik1",   en:"red",      cat:"課本 Unit 1", list:"rev" },
+    { chars:"白色",     jyut:"baak6 sik1",   en:"white",    cat:"課本 Unit 3", list:"new" },
+    { chars:"藍色",     jyut:"laam4 sik1",   en:"blue",     cat:"課本 Unit 3", list:"new" },
+    { chars:"太陽",     jyut:"taai3 joeng4", en:"sun",      cat:"課本 Unit 3", list:"new" },
+    { chars:"月亮",     jyut:"jyut6 loeng6", en:"moon",     cat:"課本 Unit 3", list:"new" },
+    { chars:"下雨",     jyut:"haa6 jyu5",    en:"rain",     cat:"新詞",        list:"new" },
+    { chars:"媽媽",     jyut:"maa1 maa1",    en:"mother",   cat:"新詞",        list:"new" },
+    { chars:"爸爸",     jyut:"baa1 baa1",    en:"father",   cat:"新詞",        list:"new" },
+    { chars:"公園",     jyut:"gung1 jyun2",  en:"park",     cat:"新詞",        list:"new" },
+    { chars:"動物",     jyut:"dung6 mat6",   en:"animal",   cat:"新詞",        list:"new" },
+    { chars:"早上",     jyut:"zou2 soeng6",  en:"morning",  cat:"新詞",        list:"new" },
+    { chars:"晚上",     jyut:"maan5 soeng6", en:"evening",  cat:"新詞",        list:"new" },
+    { chars:"麵包",     jyut:"min6 baau1",   en:"bread",    cat:"新詞",        list:"new" },
+    { chars:"牛奶",     jyut:"ngau4 naai5",  en:"milk",     cat:"新詞",        list:"new" },
+    { chars:"玩具",     jyut:"wun6 geoi6",   en:"toy",      cat:"新詞",        list:"new" }
+  ];
+
+  var GAMES = {
+    listen: { title:"🎧 聽寫 Listen & Type",   sub:"Hear the Cantonese word, then write the characters",
+              panda:"🐼🎧", prompt:"listen, then write the characters", questions:8 },
+    pick:   { title:"👀 看圖選字 Pick the Word", sub:"See the English meaning, pick the right characters",
+              panda:"🐼🔍", prompt:"pick the right characters", questions:8 },
+    jyut:   { title:"🔤 拼音配對 Jyutping Match", sub:"Match the Jyutping to the characters",
+              panda:"🐼📖", prompt:"pick the characters for this Jyutping", questions:8 },
+    stroke: { title:"✏️ 筆順挑戰 Stroke Order",  sub:"Trace the character on the paper",
+              panda:"🐼✏️", prompt:"trace the faint character", questions:5 }
+  };
+
+  var PRAISE  = ["做得好！Great!","叻仔／叻女！Nice!","好厲害！Awesome!","Yes! 加油！","完美！Perfect!","太棒了！Well done!"];
+  var CHEER   = ["差少少，再試一次！","唔緊要，諗一諗！","慢慢嚟，你可以嘅！","再嚟一次就得！"];
+  var MISS    = ["記住佢，下次一定得！","睇清楚個字，再試啦！","唔怕錯，錯咗就學到！"];
+
+  /* ============================================================
+     2. SMALL HELPERS (pure — unit tested)
+     ============================================================ */
+  function norm(s){
+    return String(s === undefined || s === null ? "" : s)
+      .replace(/[\s\u3000]+/g, "")
+      .replace(/[，。、！？；：「」『』（）《》〈〉【】·,.\!?;:'"()\[\]{}<>~`\-_/\\|+*=#$%^&@]/g, "")
+      .toLowerCase();
+  }
+  /* a typed answer may also match the Jyutping, which is very forgiving */
+  function normJyut(s){
+    return String(s === undefined || s === null ? "" : s)
+      .replace(/[\s\u3000]+/g, "").toLowerCase();
+  }
+  function isCorrectAnswer(input, word){
+    var n = norm(input);
+    if (!n) return false;
+    if (n === norm(word.chars)) return true;
+    var j = normJyut(input);
+    return !!word.jyut && j === normJyut(word.jyut);
+  }
+  function shuffle(a){
+    var out = a.slice(), i, j, t;
+    for (i = out.length - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = out[i]; out[i] = out[j]; out[j] = t; }
+    return out;
+  }
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+  function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+  function uid(){ return "w" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function esc(s){
+    return String(s === undefined || s === null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function sanitizeWord(raw){
+    var w = {
+      id:   (raw && typeof raw.id === "string" && raw.id) || uid(),
+      chars:String(raw && raw.chars || "").trim(),
+      jyut: String(raw && raw.jyut  || "").trim(),
+      en:   String(raw && raw.en    || "").trim(),
+      cat:  String(raw && raw.cat   || "").trim() || "未分類",
+      list: (raw && raw.list === "new") ? "new" : "rev"
+    };
+    return w;
+  }
+  function validWords(arr){
+    if (!Array.isArray(arr)) return [];
+    var out = [], i, w;
+    for (i = 0; i < arr.length; i++){
+      w = sanitizeWord(arr[i]);
+      if (w.chars) out.push(w);
+    }
+    return out;
+  }
+
+  /* Build the word pool for a round. Revision-first puts rev words at the
+     front (shuffled) and appends new words, then takes as many as needed. */
+  function buildPool(words, pref){
+    var rev = [], neu = [], i;
+    for (i = 0; i < words.length; i++) (words[i].list === "new" ? neu : rev).push(words[i]);
+    if (pref.revisionFirst) return shuffle(rev).concat(shuffle(neu));
+    return shuffle(words);
+  }
+  function buildRound(words, pref, count){
+    var pool = buildPool(words, pref);
+    if (!pool.length) return [];
+    var out = [];
+    for (var i = 0; i < count; i++) out.push(pool[i % pool.length]);
+    return out;
+  }
+
+  /* Multiple choice: prefer distractors from the same category. */
+  function makeChoices(word, words, n){
+    var sameCat = [], others = [], i, w;
+    for (i = 0; i < words.length; i++){
+      w = words[i];
+      if (!w || w.chars === word.chars) continue;
+      if (w.cat === word.cat) sameCat.push(w); else others.push(w);
+    }
+    var bag = shuffle(sameCat).concat(shuffle(others)), opts = [word], seen = {};
+    seen[word.chars] = 1;
+    for (i = 0; i < bag.length && opts.length < (n || 4); i++){
+      if (seen[bag[i].chars]) continue;
+      seen[bag[i].chars] = 1;
+      opts.push(bag[i]);
+    }
+    return shuffle(opts);
+  }
+
+  function accuracyPct(correct, attempts){
+    if (!attempts) return null;
+    return Math.round(correct / attempts * 100);
+  }
+
+  /* Everything above this line is pure and has no DOM/browser dependency. */
+  var PURE = {
+    norm: norm, isCorrectAnswer: isCorrectAnswer, shuffle: shuffle, clamp: clamp,
+    sanitizeWord: sanitizeWord, validWords: validWords, buildPool: buildPool,
+    buildRound: buildRound, makeChoices: makeChoices, accuracyPct: accuracyPct,
+    DEFAULT_WORDS: DEFAULT_WORDS, GAMES: GAMES
+  };
+
+  /* ============================================================
+     3. STORAGE
+     ============================================================ */
+  function lsGet(key, fallback){
+    try {
+      var raw = window.localStorage.getItem(key);
+      if (raw === null || raw === undefined) return fallback;
+      var val = JSON.parse(raw);
+      return (val === null || val === undefined) ? fallback : val;
+    } catch (e){ return fallback; }
+  }
+  function lsSet(key, val){
+    try { window.localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch (e){ toast("⚠️ Could not save (storage full or blocked)"); return false; }
+  }
+
+  var state = {
+    words: [],
+    stats: { attempts:0, correct:0, streak:0, best:0, rounds:0 },
+    pref:  { revisionFirst:true, sound:true, speak:true },
+    mastery: {},          // chars -> {right:n, wrong:n}
+    tab: "rev",
+    editing: null,        // id being edited
+    round: null,          // current round object
+    session: { correct:0, attempts:0, best:0, results:[] }
+  };
+
+  function loadAll(){
+    var saved = lsGet(KEY_WORDS, null);
+    state.words = (saved === null) ? validWords(DEFAULT_WORDS) : validWords(saved);
+    var st = lsGet(KEY_STATS, null);
+    if (st && typeof st === "object"){
+      state.stats.attempts = Number(st.attempts) || 0;
+      state.stats.correct  = Number(st.correct)  || 0;
+      state.stats.streak   = Number(st.streak)   || 0;
+      state.stats.best     = Number(st.best)     || 0;
+      state.stats.rounds   = Number(st.rounds)   || 0;
+    }
+    var pr = lsGet(KEY_PREF, null);
+    if (pr && typeof pr === "object"){
+      state.pref.revisionFirst = pr.revisionFirst !== false;
+      state.pref.sound         = pr.sound !== false;
+      state.pref.speak         = pr.speak !== false;
+    }
+    var ma = lsGet(KEY_MASTERY, null);
+    state.mastery = (ma && typeof ma === "object") ? ma : {};
+  }
+  function saveWords(){ lsSet(KEY_WORDS, state.words); }
+  function saveStats(){ lsSet(KEY_STATS, state.stats); }
+  function savePref(){ lsSet(KEY_PREF, state.pref); }
+  function saveMastery(){ lsSet(KEY_MASTERY, state.mastery); }
+
+  function learnedCount(){
+    var n = 0;
+    for (var k in state.mastery){ if (state.mastery.hasOwnProperty(k) && state.mastery[k].right > 0) n++; }
+    return n;
+  }
+  function noteAnswer(word, right){
+    state.stats.attempts++;
+    if (right){
+      state.stats.correct++;
+      state.stats.streak++;
+      if (state.stats.streak > state.stats.best) state.stats.best = state.stats.streak;
+      if (!state.mastery[word.chars]) state.mastery[word.chars] = { right:0, wrong:0 };
+      state.mastery[word.chars].right++;
+    } else {
+      state.stats.streak = 0;
+      if (!state.mastery[word.chars]) state.mastery[word.chars] = { right:0, wrong:0 };
+      state.mastery[word.chars].wrong++;
+    }
+    saveStats(); saveMastery();
+    renderStats();
+  }
+
+  /* ============================================================
+     4. DOM SHORTCUTS
+     ============================================================ */
+  function $(id){ return document.getElementById(id); }
+  var el = {
+    hLearned:$("hLearned"), hStreak:$("hStreak"), hAcc:$("hAcc"),
+    homePanda:$("homePanda"), homeSpeech:$("homeSpeech"), ttsNote:$("ttsNote"),
+    screenHome:$("screen-home"), screenManage:$("screen-manage"), screenGame:$("screen-game"),
+    swRevisionFirst:$("swRevisionFirst"), swSound:$("swSound"), swSpeak:$("swSpeak"),
+    goManage:$("goManage"), goExport:$("goExport"),
+    tabRevN:$("tabRevN"), tabNewN:$("tabNewN"), fChars:$("fChars"), fJyut:$("fJyut"),
+    fEn:$("fEn"), fCat:$("fCat"), catOptions:$("catOptions"), catChips:$("catChips"),
+    saveWord:$("saveWord"), cancelEdit:$("cancelEdit"), wordList:$("wordList"),
+    exportJson:$("exportJson"), importJson:$("importJson"), resetWords:$("resetWords"),
+    fileInput:$("fileInput"),
+    gTitle:$("gTitle"), gSub:$("gSub"), gCount:$("gCount"), gBar:$("gBar"),
+    gamePanda:$("gamePanda"), gameSpeech:$("gameSpeech"), gTags:$("gTags"), gameBack:$("gameBack"),
+    areaListen:$("area-listen"), areaChoice:$("area-choice"), areaStroke:$("area-stroke"),
+    playWord:$("playWord"), answerInput:$("answerInput"), checkBtn:$("checkBtn"),
+    hintBtn:$("hintBtn"), skipBtn:$("skipBtn"),
+    choiceLabel:$("choiceLabel"), choicePrompt:$("choicePrompt"),
+    playChoice:$("playChoice"), choiceGrid:$("choiceGrid"),
+    strokePrompt:$("strokePrompt"), paper:$("paper"), checkTrace:$("checkTrace"),
+    clearTrace:$("clearTrace"), revealTrace:$("revealTrace"), skipTrace:$("skipTrace"),
+    feedback:$("feedback"), fbMark:$("fbMark"), fbMsg:$("fbMsg"), fbSub:$("fbSub"),
+    summary:$("summary"), sumEmoji:$("sumEmoji"), sumTitle:$("sumTitle"), sumSub:$("sumSub"),
+    sumCorrect:$("sumCorrect"), sumAcc:$("sumAcc"), sumStreak:$("sumStreak"),
+    sumReview:$("sumReview"), playAgain:$("playAgain"), sumHome:$("sumHome"),
+    toast:$("toast"), confetti:$("confetti")
+  };
+
+  /* ============================================================
+     5. AUDIO — Web Audio beeps + Cantonese speech
+     ============================================================ */
+  var actx = null;
+  function audio(){
+    if (!state.pref.sound) return null;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended" && actx.resume) actx.resume();
+      return actx;
+    } catch (e){ return null; }
+  }
+  function tone(freq, at, dur, type, vol){
+    var ctx = audio();
+    if (!ctx) return;
+    var t0 = ctx.currentTime + at, osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(vol || 0.16, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+  function beepCorrect(){ tone(880,0,0.14,"sine",0.18); tone(1174,0.11,0.16,"sine",0.17); tone(1568,0.22,0.28,"sine",0.15); }
+  function beepWrong(){ tone(311,0,0.16,"triangle",0.17); tone(233,0.15,0.26,"triangle",0.16); }
+  function beepTap(){ tone(660,0,0.06,"sine",0.07); }
+  function beepFinish(){ tone(659,0,0.16,"sine",0.17); tone(784,0.14,0.16,"sine",0.17); tone(988,0.28,0.18,"sine",0.17); tone(1319,0.44,0.38,"sine",0.16); }
+
+  var ttsPicked = null;      // the language we actually found a voice for
+
+  function pickVoice(){
+    if (!("speechSynthesis" in window)) return null;
+    var voices = [];
+    try { voices = window.speechSynthesis.getVoices() || []; } catch (e){ voices = []; }
+    if (!voices.length) return null;
+    var i, v;
+    for (i = 0; i < voices.length; i++){
+      v = voices[i];
+      var tag = (v.lang || "").replace("_", "-").toLowerCase();
+      if (tag.indexOf("zh-hk") === 0 || tag.indexOf("yue") === 0) return { voice:v, lang:"zh-HK" };
+    }
+    for (i = 0; i < voices.length; i++){
+      v = voices[i];
+      var t2 = (v.lang || "").replace("_", "-").toLowerCase();
+      if (t2.indexOf("zh-tw") === 0 || t2.indexOf("zh-hant") === 0) return { voice:v, lang:"zh-TW" };
+    }
+    for (i = 0; i < voices.length; i++){
+      v = voices[i];
+      var t3 = (v.lang || "").toLowerCase();
+      if (t3.indexOf("zh") === 0 || /chinese|cantonese|yue|粵|中/i.test(v.name || "")) return { voice:v, lang:"zh-TW" };
+    }
+    return null;
+  }
+  function refreshTtsNote(){
+    if (!("speechSynthesis" in window)){
+      el.ttsNote.innerHTML = "🔇 Your browser has no speech engine — use the printed Jyutping instead.";
+      return;
+    }
+    var found = pickVoice();
+    if (!found){
+      el.ttsNote.innerHTML = "ℹ️ No Cantonese voice found. Install one in your OS settings for 聽寫 audio; everything else still works.";
+      ttsPicked = null;
+      return;
+    }
+    ttsPicked = found;
+    if (found.lang === "zh-HK"){
+      el.ttsNote.innerHTML = "🔊 Cantonese voice ready: <b>zh-HK</b> (" + esc(found.voice.name) + ")";
+    } else {
+      el.ttsNote.innerHTML = "⚠️ No <b>zh-HK</b> voice found — falling back to <b>" + esc(found.lang) +
+                             "</b> (" + esc(found.voice.name) + "). Pronunciation may differ slightly.";
+    }
+  }
+  function speakZh(text){
+    if (!state.pref.speak || !text) return;
+    if (!("speechSynthesis" in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var found = ttsPicked || pickVoice();
+      if (found && found.voice) { u.voice = found.voice; u.lang = found.lang; }
+      else { u.lang = "zh-HK"; }
+      u.rate = 0.8; u.pitch = 1.05; u.volume = 1;
+      window.speechSynthesis.speak(u);
+    } catch (e){ /* speech is a bonus, never required */ }
+  }
+
+  /* ============================================================
+     6. TOAST + CONFETTI
+     ============================================================ */
+  var toastTimer = null;
+  function toast(msg){
+    el.toast.innerHTML = msg;
+    el.toast.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.toast.classList.remove("show"); }, 2600);
+  }
+
+  var confetti = { parts:[], raf:0, ctx:null };
+  function confettiCanvas(){
+    var c = el.confetti, w = window.innerWidth, h = window.innerHeight;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.floor(w * dpr); c.height = Math.floor(h * dpr);
+    var ctx = c.getContext("2d");
+    if (ctx.setTransform) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    confetti.ctx = ctx;
+    return ctx;
+  }
+  function fireConfetti(count){
+    var ctx = confettiCanvas();
+    if (!ctx) return;
+    var colors = ["#ff9dc0","#7fd8b4","#a892ff","#ffcd6b","#5bb8e8","#ff5d73"];
+    var w = window.innerWidth, h = window.innerHeight;
+    count = count || 110;
+    for (var i = 0; i < count; i++){
+      confetti.parts.push({
+        x: Math.random() * w,
+        y: -20 - Math.random() * h * 0.3,
+        vx: (Math.random() - 0.5) * 3,
+        vy: 2 + Math.random() * 3.4,
+        s: 6 + Math.random() * 8,
+        r: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        c: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+    if (!confetti.raf) confetti.raf = requestAnimationFrame(confettiTick);
+  }
+  function confettiTick(){
+    var ctx = confetti.ctx;
+    if (!ctx){ confetti.raf = 0; return; }
+    var w = window.innerWidth, h = window.innerHeight;
+    ctx.clearRect(0, 0, w, h);
+    var alive = [];
+    for (var i = 0; i < confetti.parts.length; i++){
+      var p = confetti.parts[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.r += p.vr;
+      if (p.y < h + 40){
+        alive.push(p);
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+        ctx.restore();
+      }
+    }
+    confetti.parts = alive;
+    if (alive.length){ confetti.raf = requestAnimationFrame(confettiTick); }
+    else { ctx.clearRect(0, 0, w, h); confetti.raf = 0; }
+  }
+
+  /* ============================================================
+     7. SHARED UI
+     ============================================================ */
+  function popNumber(node, value){
+    node.textContent = value;
+    node.classList.remove("pop");
+    void node.offsetWidth;
+    node.classList.add("pop");
+  }
+  function renderStats(){
+    el.hLearned.textContent = learnedCount();
+    el.hStreak.textContent  = state.stats.streak;
+    var a = accuracyPct(state.stats.correct, state.stats.attempts);
+    el.hAcc.textContent = (a === null ? "–" : a + "%");
+  }
+  function setPanda(node, mood, base){
+    var b = base || "🐼";
+    node.classList.remove("happy", "sad");
+    if (mood === "happy"){ node.textContent = b + "👍"; node.classList.add("happy"); }
+    else if (mood === "sad"){ node.textContent = b + "😢"; node.classList.add("sad"); }
+    else { node.textContent = b; }
+  }
+  function showFeedback(kind, mark, msg, sub){
+    el.feedback.className = "feedback show " + kind;
+    el.fbMark.textContent = mark;
+    el.fbMsg.innerHTML = msg;
+    el.fbSub.innerHTML = sub || "";
+  }
+  function hideFeedback(){ el.feedback.className = "feedback"; }
+
+  function show(screen){
+    el.screenHome.classList.toggle("hide", screen !== "home");
+    el.screenManage.classList.toggle("hide", screen !== "manage");
+    el.screenGame.classList.toggle("hide", screen !== "game");
+    try { window.scrollTo(0, 0); } catch (e){}
+  }
+  function setSwitch(node, on){
+    node.classList.toggle("on", !!on);
+    node.setAttribute("aria-checked", on ? "true" : "false");
+  }
+
+  /* ============================================================
+     8. WORD MANAGER
+     ============================================================ */
+  function wordsOf(list){ return state.words.filter(function(w){ return w.list === list; }); }
+  function categories(){
+    var seen = {}, out = [], i, c;
+    for (i = 0; i < state.words.length; i++){
+      c = state.words[i].cat;
+      if (c && !seen[c]){ seen[c] = 1; out.push(c); }
+    }
+    return out.sort();
+  }
+  function renderManager(){
+    el.tabRevN.textContent = "(" + wordsOf("rev").length + ")";
+    el.tabNewN.textContent = "(" + wordsOf("new").length + ")";
+    document.querySelectorAll(".tab").forEach(function(t){
+      t.classList.toggle("active", t.getAttribute("data-tab") === state.tab);
+    });
+
+    var cats = categories(), html = "";
+    for (var i = 0; i < cats.length; i++){
+      html += '<span class="cat" data-cat="' + esc(cats[i]) + '">' + esc(cats[i]) + "</span>";
+    }
+    el.catChips.innerHTML = html;
+
+    var opt = "";
+    for (var k = 0; k < cats.length; k++) opt += '<option value="' + esc(cats[k]) + '"></option>';
+    el.catOptions.innerHTML = opt;
+
+    var list = wordsOf(state.tab);
+    if (!list.length){
+      el.wordList.innerHTML = '<div class="empty">No words in this list yet.<br>Add one above ☝️</div>';
+      return;
+    }
+    var rows = "";
+    for (var j = 0; j < list.length; j++){
+      var w = list[j];
+      rows += '<div class="wrow">' +
+        '<div class="w-cn">' + esc(w.chars) + "</div>" +
+        '<div class="w-mid">' +
+          '<div class="w-jy">' + (w.jyut ? esc(w.jyut) : "<i>no jyutping</i>") + "</div>" +
+          '<div class="w-en">' + (w.en ? esc(w.en) : "<i>no meaning</i>") + "</div>" +
+          '<span class="w-tag">' + esc(w.cat) + "</span>" +
+        "</div>" +
+        '<div class="acts">' +
+          '<button class="icon-btn" data-say="' + esc(w.chars) + '" title="Hear it">🔊</button>' +
+          '<button class="icon-btn" data-edit="' + esc(w.id) + '" title="Edit">✏️</button>' +
+          '<button class="icon-btn" data-del="' + esc(w.id) + '" title="Delete">🗑️</button>' +
+        "</div></div>";
+    }
+    el.wordList.innerHTML = rows;
+  }
+  function clearForm(){
+    state.editing = null;
+    el.fChars.value = ""; el.fJyut.value = ""; el.fEn.value = ""; el.fCat.value = "";
+    el.saveWord.textContent = "➕ Add to list";
+    el.cancelEdit.classList.add("hide");
+  }
+  function startEdit(id){
+    var w = null, i;
+    for (i = 0; i < state.words.length; i++) if (state.words[i].id === id) w = state.words[i];
+    if (!w) return;
+    state.editing = id;
+    el.fChars.value = w.chars; el.fJyut.value = w.jyut;
+    el.fEn.value = w.en; el.fCat.value = w.cat;
+    el.saveWord.textContent = "💾 Save changes";
+    el.cancelEdit.classList.remove("hide");
+    el.fChars.focus();
+    try { el.fChars.scrollIntoView({ behavior:"smooth", block:"center" }); } catch (e){}
+  }
+  function commitForm(){
+    var chars = el.fChars.value.trim();
+    if (!chars){ toast("⚠️ 中文字 is required"); el.fChars.focus(); return; }
+    var data = {
+      chars: chars,
+      jyut:  el.fJyut.value.trim(),
+      en:    el.fEn.value.trim(),
+      cat:   el.fCat.value.trim() || "未分類",
+      list:  state.tab
+    };
+    if (state.editing){
+      for (var i = 0; i < state.words.length; i++){
+        if (state.words[i].id === state.editing){
+          state.words[i].chars = data.chars;
+          state.words[i].jyut  = data.jyut;
+          state.words[i].en    = data.en;
+          state.words[i].cat   = data.cat;
+          state.words[i].list  = data.list;
+        }
+      }
+      toast("💾 Saved 「" + esc(data.chars) + "」");
+    } else {
+      var dup = state.words.some(function(w){ return w.chars === data.chars && w.list === data.list; });
+      if (dup){ toast("⚠️ 「" + esc(data.chars) + "」 is already in this list"); return; }
+      state.words.push(sanitizeWord(data));
+      toast("➕ Added 「" + esc(data.chars) + "」");
+    }
+    saveWords();
+    clearForm();
+    renderManager();
+    fillGameStats();
+  }
+  function deleteWord(id){
+    var w = null, i;
+    for (i = 0; i < state.words.length; i++) if (state.words[i].id === id) w = state.words[i];
+    if (!w) return;
+    if (!window.confirm("Delete 「" + w.chars + "」 from your list?")) return;
+    state.words = state.words.filter(function(x){ return x.id !== id; });
+    if (state.editing === id) clearForm();
+    saveWords();
+    renderManager();
+    toast("🗑️ Deleted");
+  }
+  function fillGameStats(){ renderStats(); }
+
+  /* ---- import / export ---- */
+  function download(filename, text, mime){
+    try {
+      var blob = new Blob([text], { type: (mime || "text/plain") + ";charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      return true;
+    } catch (e){ toast("⚠️ Download blocked by the browser"); return false; }
+  }
+  function exportWordsJson(){
+    var payload = {
+      app: "中文默書樂園 P3",
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      words: state.words
+    };
+    var name = "words-" + new Date().toISOString().slice(0, 10) + ".json";
+    if (download(name, JSON.stringify(payload, null, 2), "application/json")) toast("💾 Exported " + name);
+  }
+  function importWordsJson(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      var data = null;
+      try { data = JSON.parse(String(reader.result)); }
+      catch (e){ toast("❌ That file is not valid JSON"); return; }
+      var arr = Array.isArray(data) ? data : (data && data.words);
+      var cleaned = validWords(arr);
+      if (!cleaned.length){ toast("❌ No words found in that file"); return; }
+      var replace = window.confirm(
+        "Found " + cleaned.length + " words.\n\n" +
+        "OK  = REPLACE my current " + state.words.length + " words\n" +
+        "Cancel = MERGE (add the new ones)");
+      if (replace) state.words = cleaned;
+      else {
+        var have = {};
+        state.words.forEach(function(w){ have[w.chars + "|" + w.list] = 1; });
+        cleaned.forEach(function(w){ if (!have[w.chars + "|" + w.list]) state.words.push(w); });
+      }
+      saveWords(); renderManager(); renderStats();
+      toast("📂 Imported — now " + state.words.length + " words");
+    };
+    reader.onerror = function(){ toast("❌ Could not read that file"); };
+    reader.readAsText(file);
+  }
+
+  /* ---- GitHub export ---- */
+  /* Serialise the page, but first neutralise the classes the app adds while it
+     runs (visible screen, open overlays, filled word list, in-progress form) so
+     the downloaded copy boots into a clean home screen. The app re-renders all
+     of that from localStorage on load anyway. */
+  function pageSource(){
+    function reset(id, cls){ var n = $(id); if (n) n.className = cls; }
+    reset("screen-home", ""); reset("screen-manage", "hide"); reset("screen-game", "hide");
+    reset("summary", "overlay"); reset("feedback", "feedback");
+    reset("answerInput", ""); reset("strokePrompt", "");
+    reset("choiceGrid", ""); reset("wordList", ""); reset("gTags", ""); reset("catChips", "");
+    ["fChars", "fJyut", "fEn", "fCat"].forEach(function(id){ var n = $(id); if (n) n.value = ""; });
+    return "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  }
+  function readmeText(){
+    return [
+      "# 🐼 中文默書樂園 · P3 Chinese Dictation",
+      "",
+      "A single-file Cantonese dictation practice app for Hong Kong Primary 3 students.",
+      "No libraries, no CDN, no build step — just open `index.html` in a browser.",
+      "",
+      "## Features",
+      "",
+      "- **Word manager** — add / edit / delete words with Chinese, Jyutping, English and a category tag.",
+      "- **Two lists** — Revision (已學) and New Words (新詞), saved in your browser via `localStorage`.",
+      "- **Import / Export** — back up your whole word list as JSON.",
+      "- **Cantonese audio** — Web Speech API with `zh-HK`, falling back to `zh-TW`.",
+      "- **Four games** — 聽寫 (listen & type), 看圖選字 (pick the word), 拼音配對 (Jyutping match), 筆順挑戰 (trace the strokes).",
+      "- **Progress** — words learned, current streak, accuracy %, plus confetti at a 5-streak.",
+      "",
+      "## Deploy to GitHub Pages (3 steps)",
+      "",
+      "1. **Create a repo and push this folder** (run these in the folder containing `index.html`):",
+      "",
+      "   ```bash",
+      "   git init -b main",
+      "   git add index.html README.md",
+      "   git commit -m \"Add P3 Chinese dictation app\"",
+      "   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git",
+      "   git push -u origin main",
+      "   ```",
+      "",
+      "2. **Turn on Pages** — open your repo on GitHub, then go to **Settings → Pages**,",
+      "   set **Source** to `Deploy from a branch`, **Branch** to `main` and folder to `/ (root)`, then **Save**.",
+      "",
+      "3. **Open your site** — wait about a minute, then visit:",
+      "",
+      "   ```",
+      "   https://YOUR-USERNAME.github.io/YOUR-REPO/",
+      "   ```",
+      "",
+      "## Notes",
+      "",
+      "- Everything runs in the browser; no data is ever uploaded anywhere.",
+      "- Word lists are stored per-browser in `localStorage`. Use **Export JSON** to move them between devices.",
+      "- Cantonese pronunciation needs a `zh-HK` voice installed in your operating system. The app tells you on the home screen which voice it found.",
+      "- Each player's progress lives in their own browser, so a GitHub Pages link shared with students starts them from the default word list.",
+      ""
+    ].join("\n");
+  }
+  function exportForGitHub(){
+    var html = pageSource();
+    download("index.html", html, "text/html");
+    setTimeout(function(){ download("README.md", readmeText(), "text/markdown"); }, 500);
+    toast("⬇️ Downloaded index.html + README.md — put both in your repo root");
+  }
+
+  /* ============================================================
+     9. GAME ENGINE
+     ============================================================ */
+  var round = null;
+  var tracing = null;   // { target:canvas, drawn:bool }
+
+  function startGame(mode){
+    if (!state.words.length){
+      toast("⚠️ Add some words first");
+      show("manage"); renderManager();
+      return;
+    }
+    var cfg = GAMES[mode];
+    var qs = buildRound(state.words, state.pref, cfg.questions);
+    round = {
+      mode: mode, cfg: cfg, qs: qs, i: 0, attempts: 0, locked: false, gotFirst: false,
+      correct: 0, answered: 0, best: 0, results: []
+    };
+    state.session = { correct:0, attempts:0, best:0, results:[] };
+
+    el.gTitle.textContent = cfg.title;
+    el.gSub.textContent = cfg.sub;
+    el.gamePanda.textContent = cfg.panda;
+    el.areaListen.classList.toggle("hide", mode !== "listen");
+    el.areaChoice.classList.toggle("hide", !(mode === "pick" || mode === "jyut"));
+    el.areaStroke.classList.toggle("hide", mode !== "stroke");
+    show("game");
+    loadQuestion();
+  }
+
+  function renderRoundHead(){
+    el.gCount.textContent = (Math.min(round.i + 1, round.qs.length)) + " / " + round.qs.length;
+    el.gBar.style.width = (round.i / round.qs.length * 100) + "%";
+  }
+
+  function tagHtml(word){
+    var out = "";
+    if (word.cat) out += '<span class="tag">🏷️ ' + esc(word.cat) + "</span>";
+    out += '<span class="tag">' + (word.list === "new" ? "🌱 New word" : "⭐ Revision") + "</span>";
+    if (word.jyut) out += '<span class="tag">🔤 ' + esc(word.jyut) + "</span>";
+    return out;
+  }
+
+  function loadQuestion(){
+    var q = round.qs[round.i];
+    round.attempts = 0;
+    round.locked = false;
+    round.gotFirst = false;
+    hideFeedback();
+    renderRoundHead();
+    setPanda(el.gamePanda, "idle", round.cfg.panda);
+    el.gTags.innerHTML = tagHtml(q);
+    el.gameSpeech.textContent = "第 " + (round.i + 1) + " 題 — " +
+      (round.mode === "listen" ? "聽吓，然後打中文字！" :
+       round.mode === "pick"   ? "揀正確嘅中文字！" :
+       round.mode === "jyut"   ? "邊個字係呢個粵拼？" : "用手指跟住灰色嘅字描！");
+
+    if (round.mode === "listen")      setupListen(q);
+    else if (round.mode === "pick" || round.mode === "jyut") setupChoice(q);
+    else                               setupStroke(q);
+  }
+
+  /* ---------- Game A: 聽寫 ---------- */
+  function setupListen(q){
+    el.answerInput.value = "";
+    el.answerInput.disabled = false;
+    el.answerInput.classList.remove("shake", "win");
+    el.checkBtn.disabled = false; el.hintBtn.disabled = false; el.skipBtn.disabled = false;
+    el.playWord.disabled = false;
+    try { el.answerInput.focus(); } catch (e){}
+    setTimeout(function(){ if (round && round.mode === "listen") speakZh(q.chars); }, 420);
+  }
+  function listenWrong(){
+    round.attempts++;
+    beepWrong();
+    setPanda(el.gamePanda, "sad", round.cfg.panda);
+    el.answerInput.classList.add("shake");
+    setTimeout(function(){ el.answerInput.classList.remove("shake"); }, 460);
+
+    if (round.attempts === 1){
+      noteAnswer(round.qs[round.i], false);
+      round.best = Math.max(round.best, 0);
+      showFeedback("bad", "❌", "差少少，再試一次！Almost — try once more.",
+        "Listen again with 🔊, then press Enter. （仲有一次機會）");
+      el.gameSpeech.textContent = pick(CHEER) + " 再聽一次啦 🎧";
+      speakZh(round.qs[round.i].chars);
+      el.answerInput.select();
+      try { el.answerInput.focus(); } catch (e){}
+    } else {
+      noteAnswer(round.qs[round.i], false);
+      revealListen(round.qs[round.i], false);
+    }
+  }
+  function revealListen(q, skipped){
+    round.locked = true;
+    el.checkBtn.disabled = true; el.hintBtn.disabled = true; el.skipBtn.disabled = true;
+    el.answerInput.disabled = true;
+    setPanda(el.gamePanda, "sad", round.cfg.panda);
+    showFeedback("bad", skipped ? "⏭️" : "❌",
+      "正確答案：<span class='answer-chars'>" + esc(q.chars) + "</span>",
+      (q.en ? esc(q.en) + " · " : "") + (q.jyut ? esc(q.jyut) + " · " : "") +
+      pick(MISS) + " — 下一題…");
+    el.gameSpeech.textContent = "答案係「" + q.chars + "」。記住佢！";
+    speakZh(q.chars);
+    recordResult(q, skipped ? "skipped" : "missed");
+    setTimeout(nextQuestion, 2400);
+  }
+
+  /* ---------- Games B & C: multiple choice ---------- */
+  function setupChoice(q){
+    el.choiceLabel.textContent = (round.mode === "pick")
+      ? "pick the characters for this meaning"
+      : "pick the characters for this Jyutping";
+    if (round.mode === "pick"){
+      el.choicePrompt.textContent = q.en || q.chars;
+      el.choicePrompt.classList.remove("jyut");
+    } else {
+      el.choicePrompt.textContent = q.jyut || "(no jyutping for this word)";
+      el.choicePrompt.classList.add("jyut");
+    }
+    /* hearing the word is a help in 看圖選字, but would spoil 拼音配對 */
+    el.playChoice.classList.toggle("hide", round.mode !== "pick");
+    if (round.mode === "pick") setTimeout(function(){ if (round && round.mode === "pick") speakZh(q.chars); }, 420);
+
+    var opts = makeChoices(q, state.words, 4);
+    var html = "";
+    for (var i = 0; i < opts.length; i++){
+      html += '<button class="choice" data-choice="' + esc(opts[i].chars) + '">' +
+                esc(opts[i].chars) +
+                (round.mode === "pick" && opts[i].jyut ? "<small>" + esc(opts[i].jyut) + "</small>" : "") +
+              "</button>";
+    }
+    el.choiceGrid.innerHTML = html;
+  }
+  function answerChoice(chars, btn){
+    if (round.locked) return;
+    var q = round.qs[round.i];
+    var right = (chars === q.chars);
+    var buttons = el.choiceGrid.querySelectorAll(".choice");
+    var i;
+    if (right){
+      round.locked = true;
+      btn.classList.add("right");
+      for (i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+      beepCorrect();
+      noteAnswer(q, true);
+      round.correct++; round.answered++;
+      round.best = Math.max(round.best, state.stats.streak);
+      setPanda(el.gamePanda, "happy", round.cfg.panda);
+      showFeedback("ok", "✅", pick(PRAISE),
+        "正確！<b>" + esc(q.chars) + "</b>" + (q.en ? " — " + esc(q.en) : "") +
+        (q.jyut ? " · " + esc(q.jyut) : "") + " · Streak " + state.stats.streak + " 🔥");
+      el.gameSpeech.textContent = state.stats.streak >= 5
+        ? "連中 " + state.stats.streak + " 題！On fire! 🔥" : pick(PRAISE) + " 繼續！";
+      speakZh(q.chars);
+      afterCorrectConfetti();
+      recordResult(q, "first");
+      setTimeout(nextQuestion, 1300);
+    } else {
+      btn.classList.add("wrong");
+      btn.disabled = true;
+      beepWrong();
+      noteAnswer(q, false);
+      round.attempts++;
+      setPanda(el.gamePanda, "sad", round.cfg.panda);
+      if (round.attempts === 1){
+        showFeedback("bad", "❌", "唔啱，再揀一次！Not that one — try again.",
+          "提示：正確答案有 " + q.chars.length + " 個字。");
+        el.gameSpeech.textContent = pick(CHEER);
+      } else {
+        round.locked = true;
+        for (i = 0; i < buttons.length; i++){
+          buttons[i].disabled = true;
+          if (buttons[i].getAttribute("data-choice") === q.chars) buttons[i].classList.add("right");
+        }
+        round.answered++;
+        showFeedback("bad", "❌", "正確答案：<span class='answer-chars'>" + esc(q.chars) + "</span>",
+          (q.en ? esc(q.en) + " · " : "") + (q.jyut ? esc(q.jyut) + " · " : "") + pick(MISS));
+        el.gameSpeech.textContent = "答案係「" + q.chars + "」。";
+        speakZh(q.chars);
+        recordResult(q, "missed");
+        setTimeout(nextQuestion, 2400);
+      }
+    }
+  }
+
+  /* ---------- Game D: 筆順挑戰 (trace) ---------- */
+  function targetGlyph(q){ return String(q.chars || "").charAt(0); }
+
+  function sizeCanvas(){
+    var c = el.paper;
+    var rect = c.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.max(1, Math.floor(rect.width * dpr));
+    c.height = Math.max(1, Math.floor(rect.height * dpr));
+    return { w:c.width, h:c.height, dpr:dpr };
+  }
+  function drawTargetGlyph(ctx, w, h, glyph, color, fontScale){
+    var size = Math.min(w, h) * (fontScale || 0.78);
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "bold " + Math.round(size) + "px \"PingFang HK\",\"Microsoft JhengHei\",\"Noto Sans CJK TC\",\"PMingLiU\",serif";
+    ctx.fillText(glyph, w / 2, h / 2 + size * 0.03);
+    ctx.restore();
+  }
+  function setupStroke(q){
+    var c = el.paper, dim = sizeCanvas(), ctx = c.getContext("2d");
+    var dpr = dim.dpr, w = dim.w, h = dim.h;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    /* paper + guide cross */
+    ctx.fillStyle = "#fffdf9"; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#f3e6ee"; ctx.lineWidth = Math.max(1, 2 * dpr);
+    ctx.beginPath();
+    ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+    ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+    ctx.stroke();
+    ctx.strokeStyle = "#ffd7e6";
+    ctx.strokeRect(2 * dpr, 2 * dpr, w - 4 * dpr, h - 4 * dpr);
+
+    var glyph = targetGlyph(q);
+    el.strokePrompt.textContent = glyph;
+
+    /* the faint character is drawn ON the visible canvas and the child traces
+       over it; we keep a separate clean copy to verify coverage against. */
+    drawTargetGlyph(ctx, w, h, glyph, "#ece7ef", 0.78);
+
+    tracing = { glyph: glyph, w:w, h:h, dpr:dpr, hasInk:false, drawing:false, last:null };
+    /* offscreen "ink" layer, transparent except for the traced strokes */
+    var ink = document.createElement("canvas");
+    ink.width = w; ink.height = h;
+    tracing.ink = ink;
+    tracing.inkCtx = ink.getContext("2d", { willReadFrequently:true });
+    tracing.inkCtx.lineWidth = Math.max(7 * dpr, Math.min(w, h) * 0.075);
+    tracing.inkCtx.lineCap = "round";
+    tracing.inkCtx.lineJoin = "round";
+    tracing.inkCtx.strokeStyle = "#5bb8e8";
+
+    /* reference mask of where the glyph actually is. We stamp the glyph five
+       times with a small offset and low alpha: the union of the stamps is a
+       slightly dilated silhouette, which tolerates a wobbly child's stroke
+       without letting a random scribble pass. */
+    var ref = document.createElement("canvas");
+    ref.width = w; ref.height = h;
+    var rctx = ref.getContext("2d", { willReadFrequently:true });
+    drawTargetGlyph(rctx, w, h, glyph, "#000", 0.78);
+    var pad = Math.max(2, Math.round(Math.min(w, h) * 0.025));
+    var offs = [[-pad, 0], [pad, 0], [0, -pad], [0, pad]];
+    rctx.globalAlpha = 0.55;
+    for (var oi = 0; oi < offs.length; oi++){
+      rctx.save();
+      rctx.translate(offs[oi][0], offs[oi][1]);
+      drawTargetGlyph(rctx, w, h, glyph, "#000", 0.78);
+      rctx.restore();
+    }
+    rctx.globalAlpha = 1;
+    tracing.refData = rctx.getImageData(0, 0, w, h).data;
+
+    el.checkTrace.disabled = false;
+    el.clearTrace.disabled = false;
+    el.revealTrace.disabled = false;
+    el.skipTrace.disabled = false;
+    /* the ink layer is composited onto the visible canvas after every stroke */
+    tracing.redraw = function(){
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fffdf9"; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "#f3e6ee"; ctx.lineWidth = Math.max(1, 2 * dpr);
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+      ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+      ctx.stroke();
+      drawTargetGlyph(ctx, w, h, glyph, "#ece7ef", 0.78);
+      ctx.drawImage(ink, 0, 0);
+    };
+  }
+  function pointerPos(ev){
+    var c = el.paper, rect = c.getBoundingClientRect();
+    var dpr = tracing ? tracing.dpr : 1;
+    var src = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+    return { x:(src.clientX - rect.left) * dpr, y:(src.clientY - rect.top) * dpr };
+  }
+  function traceDown(ev){
+    if (!tracing || round.locked) return;
+    ev.preventDefault();
+    tracing.drawing = true;
+    tracing.last = pointerPos(ev);
+    traceDot(tracing.last);
+  }
+  function traceMove(ev){
+    if (!tracing || !tracing.drawing || round.locked) return;
+    ev.preventDefault();
+    var p = pointerPos(ev), l = tracing.last, ic = tracing.inkCtx;
+    ic.strokeStyle = "#5bb8e8";
+    ic.lineWidth = Math.max(7 * tracing.dpr, Math.min(tracing.w, tracing.h) * 0.075);
+    ic.beginPath(); ic.moveTo(l.x, l.y); ic.lineTo(p.x, p.y); ic.stroke();
+    tracing.last = p;
+    tracing.hasInk = true;
+    tracing.redraw();
+  }
+  function traceDot(p){
+    var ic = tracing.inkCtx;
+    ic.fillStyle = "#5bb8e8";
+    ic.beginPath();
+    ic.arc(p.x, p.y, Math.max(3.5 * tracing.dpr, Math.min(tracing.w, tracing.h) * 0.037), 0, Math.PI * 2);
+    ic.fill();
+    tracing.hasInk = true;
+    tracing.redraw();
+  }
+  function traceUp(ev){ if (tracing){ tracing.drawing = false; tracing.last = null; } if (ev && ev.preventDefault) ev.preventDefault(); }
+
+  /* Basic stroke check: how much of the faint glyph did the child cover, and
+     how much did they scribble outside it? Thresholds are deliberately
+     forgiving — P3 children trace wobbly lines. */
+  var TRACE_MIN_COVERAGE = 0.25;   // must cover at least a quarter of the glyph
+  var TRACE_MAX_OUTSIDE  = 0.70;   // at most 70% of the drawing may be off-glyph
+
+  function evaluateTrace(){
+    if (!tracing || !tracing.hasInk) return { ok:false, reason:"empty", coverage:0, outside:0 };
+    var w = tracing.w, h = tracing.h, ref = tracing.refData;
+    var inkData = tracing.inkCtx.getImageData(0, 0, w, h).data;
+    var refCells = 0, hitCells = 0, inkCells = 0;
+    var step = 3;
+    for (var y = 0; y < h; y += step){
+      for (var x = 0; x < w; x += step){
+        var i = (y * w + x) * 4;
+        var refInk = ref[i + 3] > 90;
+        var userInk = inkData[i + 3] > 40;
+        if (refInk) refCells++;
+        if (userInk) inkCells++;
+        if (refInk && userInk) hitCells++;
+      }
+    }
+    if (!refCells) return { ok:false, reason:"empty", coverage:0, outside:0 };
+    if (!inkCells) return { ok:false, reason:"empty", coverage:0, outside:0 };
+    var coverage = hitCells / refCells;                 // % of the glyph covered
+    var outside = inkCells ? 1 - (hitCells / inkCells) : 0;  // % of drawing off-glyph
+    var ok = coverage >= TRACE_MIN_COVERAGE && outside <= TRACE_MAX_OUTSIDE;
+    var reason = ok ? "ok" : (coverage < TRACE_MIN_COVERAGE ? "too-little" : "too-messy");
+    return { ok:ok, reason:reason, coverage:coverage, outside:outside };
+  }
+  function checkTrace(){
+    if (!tracing || round.locked) return;
+    var q = round.qs[round.i];
+    var res = evaluateTrace();
+    if (res.ok){
+      round.locked = true;
+      beepCorrect();
+      noteAnswer(q, true);
+      round.correct++; round.answered++;
+      round.best = Math.max(round.best, state.stats.streak);
+      setPanda(el.gamePanda, "happy", round.cfg.panda);
+      showFeedback("ok", "✅", pick(PRAISE),
+        "你描咗 " + Math.round(res.coverage * 100) + "% 嘅「" + esc(tracing.glyph) + "」！" +
+        (q.jyut ? " · " + esc(q.jyut) : "") + " · Streak " + state.stats.streak + " 🔥");
+      el.gameSpeech.textContent = "好手勢！" + (q.en ? q.en + " " : "") + "寫得靚 💪";
+      speakZh(q.chars);
+      afterCorrectConfetti();
+      recordResult(q, "first");
+      setTimeout(nextQuestion, 1400);
+    } else {
+      round.attempts++;
+      beepWrong();
+      setPanda(el.gamePanda, "sad", round.cfg.panda);
+      if (round.attempts === 1){
+        noteAnswer(q, false);
+        showFeedback("bad", "❌",
+          res.reason === "too-little" ? "仲未夠 — trace more of the character! (cover about a third)"
+                                      : "出界啦 — stay closer to the grey character!",
+          "你而家描到 " + Math.round(res.coverage * 100) + "%。再試一次，或者按 👀 Show me。");
+        el.gameSpeech.textContent = "再試一次，跟住灰色嘅線描 ✏️";
+      } else {
+        noteAnswer(q, false);
+        round.answered++;
+        showFeedback("bad", "❌", "正確寫法：<span class='answer-chars'>" + esc(tracing.glyph) + "</span>",
+          (q.en ? esc(q.en) + " · " : "") + (q.jyut ? esc(q.jyut) + " · " : "") + pick(MISS));
+        el.gameSpeech.textContent = "睇清楚「" + tracing.glyph + "」點寫，下次一定得！";
+        speakZh(q.chars);
+        revealStroke(true);
+        recordResult(q, "missed");
+        setTimeout(nextQuestion, 2500);
+      }
+    }
+  }
+  function revealStroke(auto){
+    if (!tracing) return;
+    var ctx = el.paper.getContext("2d");
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    drawTargetGlyph(ctx, tracing.w, tracing.h, tracing.glyph, "#ff5d73", 0.78);
+    ctx.restore();
+    if (!auto) toast("👀 跟住紅色嘅字描！");
+  }
+  function clearTrace(){
+    if (!tracing) return;
+    tracing.inkCtx.clearRect(0, 0, tracing.w, tracing.h);
+    tracing.hasInk = false;
+    tracing.redraw();
+    beepTap();
+  }
+
+  /* ---------- shared round plumbing ---------- */
+  function afterCorrectConfetti(){
+    if (state.stats.streak > 0 && state.stats.streak % 5 === 0){
+      fireConfetti(130);
+      toast("🔥 " + state.stats.streak + " in a row! 連中 " + state.stats.streak + " 題！");
+    }
+  }
+  function recordResult(q, stateName){
+    round.results.push({ chars:q.chars, en:q.en, jyut:q.jyut, state:stateName, glyph:tracing ? tracing.glyph : null });
+  }
+  function nextQuestion(){
+    round.i++;
+    if (round.i >= round.qs.length){ finishRound(); return; }
+    loadQuestion();
+  }
+
+  function finishRound(){
+    state.stats.rounds++;
+    saveStats();
+    el.gBar.style.width = "100%";
+    var n = round.qs.length;
+    var acc = accuracyPct(round.correct, n);
+    var pct = acc === null ? 0 : acc;
+    var emoji, title, sub;
+    if (pct >= 100){ emoji = "🏆"; title = "滿分！Perfect!"; sub = "你係中文小天才！Flawless round."; }
+    else if (pct >= 80){ emoji = "🌟"; title = "做得好！Great job!"; sub = "好接近完美，再玩一次挑戰滿分！"; }
+    else if (pct >= 50){ emoji = "💪"; title = "繼續努力！Good effort!"; sub = "已經進步咗，再練一次會更好。"; }
+    else { emoji = "🌱"; title = "唔緊要，再嚟過！"; sub = "每個字都練一練，下次一定更好。"; }
+
+    setPanda(el.gamePanda, pct >= 80 ? "happy" : "idle", round.cfg.panda);
+    el.gameSpeech.textContent = title + " 你答啱咗 " + round.correct + " / " + n + " 題！";
+    beepFinish();
+    if (pct >= 80) fireConfetti(160);
+
+    el.sumEmoji.textContent = emoji;
+    el.sumTitle.textContent = title;
+    el.sumSub.textContent = GAMES[round.mode].title + " · " + sub;
+    el.sumCorrect.textContent = round.correct + " / " + n;
+    el.sumAcc.textContent = pct + "%";
+    el.sumStreak.textContent = round.best;
+
+    var html = "";
+    for (var i = 0; i < round.results.length; i++){
+      var r = round.results[i];
+      var badge = r.state === "first" ? "✅ right away"
+                : r.state === "skipped" ? "⏭️ skipped"
+                : "❌ missed";
+      html += "<div><span class='no'>" + (i + 1) + ". " + esc(r.en || r.chars) + "</span>" +
+              "<span class='chars'>" + esc(r.chars) +
+              (r.jyut ? " <span class='no'>" + esc(r.jyut) + "</span>" : "") +
+              " <span class='no'>" + badge + "</span></span></div>";
+    }
+    el.sumReview.innerHTML = html || "<div class='no'>No results.</div>";
+    el.summary.classList.add("show");
+    renderStats();
+  }
+
+  /* ============================================================
+     10. EVENT WIRING
+     ============================================================ */
+  /* home */
+  document.querySelectorAll(".mode").forEach(function(b){
+    b.addEventListener("click", function(){ audio(); beepTap(); startGame(b.getAttribute("data-game")); });
+  });
+  el.goManage.addEventListener("click", function(){ audio(); show("manage"); renderManager(); clearForm(); });
+  el.goExport.addEventListener("click", function(){ audio(); exportForGitHub(); });
+
+  document.querySelectorAll("[data-home]").forEach(function(b){
+    b.addEventListener("click", function(){ audio(); show("home"); renderStats(); refreshTtsNote(); });
+  });
+  el.gameBack.addEventListener("click", function(){
+    audio();
+    if (round && round.i < round.qs.length && round.answered > 0 &&
+        !window.confirm("Leave this round? Your progress in it will be lost.")) return;
+    if ("speechSynthesis" in window){ try { window.speechSynthesis.cancel(); } catch (e){} }
+    show("home"); renderStats();
+  });
+
+  /* switches (click + keyboard) */
+  function bindSwitch(node, get, set){
+    function toggle(){
+      var next = !get();
+      set(next);
+      setSwitch(node, next);
+      savePref();
+      beepTap();
+      if (node === el.swSpeak && next) speakZh("你好");
+    }
+    node.addEventListener("click", function(){ audio(); toggle(); });
+    node.addEventListener("keydown", function(e){
+      if (e.key === " " || e.key === "Enter"){ e.preventDefault(); audio(); toggle(); }
+    });
+  }
+  bindSwitch(el.swRevisionFirst, function(){ return state.pref.revisionFirst; },
+    function(v){ state.pref.revisionFirst = v; });
+  bindSwitch(el.swSound, function(){ return state.pref.sound; },
+    function(v){ state.pref.sound = v; });
+  bindSwitch(el.swSpeak, function(){ return state.pref.speak; },
+    function(v){ state.pref.speak = v; if (!v && "speechSynthesis" in window){ try { window.speechSynthesis.cancel(); } catch (e){} } });
+
+  /* word manager */
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click", function(){
+      state.tab = t.getAttribute("data-tab");
+      renderManager();
+      clearForm();
+    });
+  });
+  el.saveWord.addEventListener("click", function(){ audio(); commitForm(); });
+  el.cancelEdit.addEventListener("click", function(){ clearForm(); });
+  el.fChars.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){ e.preventDefault(); commitForm(); }
+  });
+  el.fCat.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){ e.preventDefault(); commitForm(); }
+  });
+  el.catChips.addEventListener("click", function(e){
+    var c = e.target.getAttribute && e.target.getAttribute("data-cat");
+    if (c){ el.fCat.value = c; }
+  });
+  el.wordList.addEventListener("click", function(e){
+    var t = e.target;
+    var say  = t.getAttribute && t.getAttribute("data-say");
+    var edit = t.getAttribute && t.getAttribute("data-edit");
+    var del  = t.getAttribute && t.getAttribute("data-del");
+    if (say){ audio(); speakZh(say); }
+    else if (edit){ audio(); startEdit(edit); }
+    else if (del){ audio(); deleteWord(del); }
+  });
+  el.exportJson.addEventListener("click", function(){ audio(); exportWordsJson(); });
+  el.importJson.addEventListener("click", function(){ el.fileInput.click(); });
+  el.fileInput.addEventListener("change", function(){
+    if (el.fileInput.files && el.fileInput.files[0]) importWordsJson(el.fileInput.files[0]);
+    el.fileInput.value = "";
+  });
+  el.resetWords.addEventListener("click", function(){
+    if (!window.confirm("Replace ALL your words with the 24 built-in P3 words?\nThis cannot be undone.")) return;
+    state.words = validWords(DEFAULT_WORDS);
+    saveWords(); renderManager(); renderStats(); clearForm();
+    toast("♻️ Restored " + state.words.length + " default words");
+  });
+
+  /* Game A */
+  el.checkBtn.addEventListener("click", function(){ audio(); checkListen(); });
+  el.hintBtn.addEventListener("click", function(){
+    audio();
+    if (!round || round.locked) return;
+    var q = round.qs[round.i];
+    var first = q.chars.charAt(0);
+    var hidden = q.chars.split("").map(function(c, i){ return i === 0 ? c : "◻"; }).join("");
+    showFeedback("ok", "💡", "提示：<span style='letter-spacing:6px'>" + esc(hidden) + "</span>",
+      "第一個字係「" + esc(first) + "」，總共 " + q.chars.length + " 個字。" +
+      (q.jyut ? " 粵拼：" + esc(q.jyut) : ""));
+    el.gameSpeech.textContent = "提示：第一個字係「" + first + "」💡";
+    try { el.answerInput.focus(); } catch (e){}
+  });
+  el.skipBtn.addEventListener("click", function(){
+    audio();
+    if (!round || round.locked) return;
+    noteAnswer(round.qs[round.i], false);
+    round.answered++;
+    revealListen(round.qs[round.i], true);
+  });
+  el.playWord.addEventListener("click", function(){ audio(); if (round) speakZh(round.qs[round.i].chars); });
+  el.answerInput.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){ e.preventDefault(); audio(); checkListen(); }
+  });
+  function checkListen(){
+    if (!round || round.locked) return;
+    var val = el.answerInput.value;
+    if (!norm(val)){
+      el.answerInput.classList.add("shake");
+      setTimeout(function(){ el.answerInput.classList.remove("shake"); }, 460);
+      beepWrong();
+      el.gameSpeech.textContent = "先打中文字，再按 Check 啦 😊";
+      try { el.answerInput.focus(); } catch (e){}
+      return;
+    }
+    var q = round.qs[round.i];
+    if (isCorrectAnswer(val, q)){
+      round.locked = true;
+      el.answerInput.classList.add("win");
+      el.answerInput.disabled = true;
+      el.checkBtn.disabled = true; el.hintBtn.disabled = true; el.skipBtn.disabled = true;
+      beepCorrect();
+      noteAnswer(q, true);
+      round.correct++; round.answered++;
+      round.best = Math.max(round.best, state.stats.streak);
+      setPanda(el.gamePanda, "happy", round.cfg.panda);
+      showFeedback("ok", "✅", pick(PRAISE),
+        "正確！<b>" + esc(q.chars) + "</b>" + (q.en ? " — " + esc(q.en) : "") +
+        (q.jyut ? " · " + esc(q.jyut) : "") + " · Streak " + state.stats.streak + " 🔥");
+      el.gameSpeech.textContent = pick(PRAISE) + " 你寫得啱！";
+      speakZh(q.chars);
+      afterCorrectConfetti();
+      recordResult(q, "first");
+      setTimeout(nextQuestion, 1300);
+    } else {
+      listenWrong();
+    }
+  }
+
+  /* Games B & C */
+  el.playChoice.addEventListener("click", function(){ audio(); if (round) speakZh(round.qs[round.i].chars); });
+  el.choiceGrid.addEventListener("click", function(e){
+    var btn = e.target.closest ? e.target.closest(".choice") : null;
+    if (!btn || btn.disabled) return;
+    audio();
+    answerChoice(btn.getAttribute("data-choice"), btn);
+  });
+
+  /* Game D */
+  el.paper.addEventListener("pointerdown", traceDown);
+  el.paper.addEventListener("pointermove", traceMove);
+  el.paper.addEventListener("pointerup", traceUp);
+  el.paper.addEventListener("pointercancel", traceUp);
+  el.paper.addEventListener("pointerleave", traceUp);
+  el.paper.addEventListener("touchstart", function(e){ if (e.cancelable) e.preventDefault(); }, { passive:false });
+  el.checkTrace.addEventListener("click", function(){ audio(); checkTrace(); });
+  el.clearTrace.addEventListener("click", function(){ audio(); clearTrace(); });
+  el.revealTrace.addEventListener("click", function(){ audio(); revealStroke(false); });
+  el.skipTrace.addEventListener("click", function(){
+    audio();
+    if (!round || round.locked) return;
+    noteAnswer(round.qs[round.i], false);
+    round.answered++;
+    var q = round.qs[round.i];
+    round.locked = true;
+    showFeedback("bad", "⏭️", "正確寫法：<span class='answer-chars'>" + esc(tracing.glyph) + "</span>",
+      (q.en ? esc(q.en) + " · " : "") + (q.jyut ? esc(q.jyut) + " · " : "") + "繼續下一題…");
+    revealStroke(true);
+    speakZh(q.chars);
+    recordResult(q, "skipped");
+    setTimeout(nextQuestion, 2200);
+  });
+
+  /* summary */
+  el.playAgain.addEventListener("click", function(){
+    audio();
+    el.summary.classList.remove("show");
+    startGame(round ? round.mode : "listen");
+  });
+  el.sumHome.addEventListener("click", function(){
+    audio();
+    el.summary.classList.remove("show");
+    if ("speechSynthesis" in window){ try { window.speechSynthesis.cancel(); } catch (e){} }
+    show("home"); renderStats(); refreshTtsNote();
+  });
+
+  /* global niceties */
+  document.addEventListener("pointerdown", function(){ audio(); }, { passive:true });
+  window.addEventListener("resize", function(){
+    /* resizing the canvas clears it, so start the trace fresh for this question */
+    if (round && round.mode === "stroke" && !round.locked) setupStroke(round.qs[round.i]);
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape"){ if (el.summary.classList.contains("show")) el.sumHome.click(); }
+    if (round && (round.mode === "pick" || round.mode === "jyut") && /^[1-4]$/.test(e.key)){
+      var btns = el.choiceGrid.querySelectorAll(".choice");
+      var b = btns[Number(e.key) - 1];
+      if (b && !b.disabled) b.click();
+    }
+  });
+  if ("speechSynthesis" in window){
+    try { window.speechSynthesis.getVoices(); } catch (e){}
+    window.speechSynthesis.onvoiceschanged = refreshTtsNote;
+  }
+
+  /* ============================================================
+     11. BOOT
+     ============================================================ */
+  function boot(){
+    loadAll();
+    setSwitch(el.swRevisionFirst, state.pref.revisionFirst);
+    setSwitch(el.swSound, state.pref.sound);
+    setSwitch(el.swSpeak, state.pref.speak);
+    renderStats();
+    renderManager();
+    refreshTtsNote();
+    setTimeout(refreshTtsNote, 900);   // voices often arrive late
+    el.homeSpeech.textContent = state.words.length
+      ? "你好！你有 " + state.words.length + " 個字。揀一個遊戲開始啦！"
+      : "你嘅字表係空嘅 — 去 Manage Words 加字啦！";
+    show("home");
+  }
+
+  /* expose the pure helpers (and the tracer's verdict function) for a quick
+     self-test from the browser console: __p3, __p3trace.setup/evaluate */
+  window.__p3 = PURE;
+  window.__p3trace = {
+    minCoverage: TRACE_MIN_COVERAGE,
+    maxOutside:  TRACE_MAX_OUTSIDE,
+    /* the offscreen canvas that holds the child's strokes */
+    inkCanvas: function(){ return tracing ? tracing.ink : null; },
+    hasInk:    function(){ return !!(tracing && tracing.hasInk); },
+    /* test hook: inject a synthetic ink mask + glyph mask and get the verdict */
+    evaluateMasks: function(refData, inkData, w, h){
+      if (refData) tracing = { hasInk:true, w:w, h:h, refData:refData,
+                               inkCtx:{ getImageData:function(){ return { data:inkData }; } } };
+      return evaluateTrace();
+    },
+    clear: function(){ tracing = null; }
+  };
+
+  boot();
+})();
+</script>
+</body>
+</html>
