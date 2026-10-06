@@ -1,0 +1,18 @@
+{
+  "name": "PushUp League",
+  "short_name": "PushUp League",
+  "description": "Compete with your friends by doing push-ups every day.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#04070c",
+  "theme_color": "#04070c",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

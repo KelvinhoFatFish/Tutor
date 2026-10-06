@@ -1,0 +1,305 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   PUSHUP LEAGUE — DESIGN TOKENS
+   Dark, energetic, game-like. Electric green for progress and success,
+   electric blue for information, warm amber for streaks.
+   ========================================================================== */
+
+@theme {
+  --color-ink-950: #04070c;
+  --color-ink-900: #070c14;
+  --color-ink-850: #0b111b;
+  --color-ink-800: #101825;
+  --color-ink-700: #1a2434;
+  --color-ink-600: #2a3648;
+
+  --color-volt-400: #6dffb0;
+  --color-volt-500: #2bff88;
+  --color-volt-600: #10d96a;
+  --color-volt-700: #08a551;
+
+  --color-sky-400: #4fd8ff;
+  --color-sky-500: #00c2ff;
+  --color-sky-600: #0091d5;
+
+  --color-flame-400: #ffc247;
+  --color-flame-500: #ff9d1c;
+
+  --color-danger-400: #ff6b83;
+  --color-danger-500: #ff3d5e;
+
+  --font-display:
+    'Inter Tight', 'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-sans:
+    'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system,
+    'Helvetica Neue', Arial, sans-serif;
+
+  --radius-card: 1.25rem;
+
+  --animate-pop: pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-rise: rise 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-flame: flame 1.6s ease-in-out infinite;
+  --animate-pulse-ring: pulseRing 1.8s ease-out infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flame {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.12) rotate(2deg); }
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(43, 255, 136, 0.45); }
+  70% { box-shadow: 0 0 0 18px rgba(43, 255, 136, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(43, 255, 136, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+  25% { opacity: 1; transform: translate(-50%, -14px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: #e8eef7;
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+    /* A soft radial glow behind everything, like a stadium light. */
+    background-image:
+      radial-gradient(900px 520px at 12% -8%, rgba(43, 255, 136, 0.09), transparent 62%),
+      radial-gradient(760px 460px at 96% 4%, rgba(0, 194, 255, 0.09), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Numbers should never jitter as they count up. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Visible keyboard focus, but never on mouse/touch. */
+  :focus-visible {
+    outline: 2px solid var(--color-volt-500);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: rgba(43, 255, 136, 0.3);
+  }
+
+  input, textarea, select {
+    color-scheme: dark;
+  }
+}
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
+
+@layer components {
+  .card {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-card);
+    backdrop-filter: blur(14px);
+  }
+
+  .card-raised {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+      0 18px 44px -22px rgba(0, 0, 0, 0.9);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    font-weight: 650;
+    padding: 0.75rem 1.25rem;
+    transition: transform 140ms ease, filter 140ms ease, background-color 140ms ease;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-volt-500), var(--color-volt-600));
+    color: #04120a;
+    box-shadow: 0 12px 30px -12px rgba(43, 255, 136, 0.7);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.07);
+    color: #e8eef7;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-danger {
+    background: rgba(255, 61, 94, 0.16);
+    border-color: rgba(255, 61, 94, 0.4);
+    color: var(--color-danger-400);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: #9fb0c6;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    color: #e8eef7;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .input {
+    width: 100%;
+    background: rgba(4, 7, 12, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.85rem;
+    padding: 0.8rem 0.95rem;
+    color: #e8eef7;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+  }
+
+  .input::placeholder {
+    color: #5d6d82;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: rgba(43, 255, 136, 0.6);
+    box-shadow: 0 0 0 3px rgba(43, 255, 136, 0.14);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #9fb0c6;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.01em;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 650;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 0.92;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Skeleton shimmer used while data loads. */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.11) 37%,
+      rgba(255, 255, 255, 0.05) 63%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: 0.75rem;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
+
+/* A "+1" that floats up off the counter when a rep is counted. */
+.rep-float {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  font-weight: 800;
+  font-size: 1.75rem;
+  color: var(--color-volt-500);
+  text-shadow: 0 0 18px rgba(43, 255, 136, 0.85);
+  animation: floatUp 900ms ease-out forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
